@@ -39,17 +39,17 @@ class PPBotViewController < UIViewController
     view.addSubview(@no_button)
 
     @state = HaveTest.new
-    @state.configure(self)
+    @state.establish(self)
   end
 
   def yesTapped
     @state.yes(self)
-    @state.configure(self)
+    @state.establish(self)
   end
 
   def noTapped
     @state.no(self)
-    @state.configure(self)
+    @state.establish(self)
   end
 
   def ask(question)
@@ -98,7 +98,7 @@ class PPBotViewController < UIViewController
   end
 
   class HaveTest
-    def configure(target)
+    def establish(target)
       target.ask("Do you have a test for that?")
     end
     def yes(target)
@@ -110,7 +110,7 @@ class PPBotViewController < UIViewController
   end
 
   class WriteTest
-    def configure(target)
+    def establish(target)
       target.doit("Write a test.")
     end
     def yes(target)
@@ -121,7 +121,7 @@ class PPBotViewController < UIViewController
   end
 
   class TestPass
-    def configure(target)
+    def establish(target)
       target.ask("Does the test pass?")
     end
     def yes(target)
@@ -133,7 +133,7 @@ class PPBotViewController < UIViewController
   end
 
   class WriteCode
-    def configure(target)
+    def establish(target)
       target.doit("Write just enough code", "for the test to pass.")
     end
     def yes(target)
@@ -144,7 +144,7 @@ class PPBotViewController < UIViewController
   end
 
   class NeedToRefactor
-    def configure(target)
+    def establish(target)
       target.ask("Do you need to refactor?")
     end
     def yes(target)
@@ -156,7 +156,7 @@ class PPBotViewController < UIViewController
   end
 
   class SelectFeature
-    def configure(target)
+    def establish(target)
       target.doit("Select a feature", "to implement.")
     end
     def yes(target)
@@ -167,7 +167,7 @@ class PPBotViewController < UIViewController
   end
 
   class Refactor
-    def configure(target)
+    def establish(target)
       target.doit("Refactor the code.")
     end
     def yes(target)
@@ -176,6 +176,8 @@ class PPBotViewController < UIViewController
     def no(target)
     end
   end
+
+  private
 
   def create_title
     @title_y = 30
