@@ -194,14 +194,14 @@ class PPBotViewController < UIViewController
 
   def create_title_label(text)
     label = UILabel.new
-    label.font = UIFont.systemFontOfSize(30)
+    label.font = UIFont.systemFontOfSize(40)
     label.text = text
     label.textAlignment = UITextAlignmentCenter
     label.textColor = UIColor.whiteColor
     label.backgroundColor = UIColor.clearColor
-    label.frame = [[margin, @title_y], [view.frame.size.width - margin * 2, 40]]
+    label.frame = [[margin, @title_y], [view.frame.size.width - margin * 2, 45]]
     view.addSubview(label)
-    @title_y += 40
+    @title_y += 45
     label
   end
 end
