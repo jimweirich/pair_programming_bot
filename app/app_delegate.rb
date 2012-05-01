@@ -4,6 +4,6 @@ class AppDelegate
     @window.rootViewController = PPBotViewController.alloc.init
     @window.rootViewController.wantsFullScreenLayout = true
     @window.makeKeyAndVisible
-    return true
+    true
   end
 end
