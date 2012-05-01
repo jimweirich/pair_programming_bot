@@ -38,7 +38,7 @@ class PPBotViewController < UIViewController
     @no_button.frame = [[margin, top+3*60], [view.frame.size.width - margin * 2, 40]]
     view.addSubview(@no_button)
 
-    @state = HaveTest.new
+    @state = HaveTestState.instance
     @state.establish(self)
   end
 
@@ -97,81 +97,87 @@ class PPBotViewController < UIViewController
     @green ||= UIColor.colorWithRed(0.10, green: 0.60, blue: 0.10, alpha: 1.0)
   end
 
-  class HaveTest
+  class ProgrammingState
+    def self.instance
+      @instance ||= new
+    end
+  end
+
+  class HaveTestState < ProgrammingState
     def establish(target)
       target.ask("Do you have a test for that?")
     end
     def yes(target)
-      target.state = TestPass.new
+      target.state = TestPassState.instance
     end
     def no(target)
-      target.state = WriteTest.new
+      target.state = WriteTestState.instance
     end
   end
 
-  class WriteTest
+  class WriteTestState < ProgrammingState
     def establish(target)
       target.doit("Write a test.")
     end
     def yes(target)
-      target.state = TestPass.new
+      target.state = TestPassState.instance
     end
     def no(target)
     end
   end
 
-  class TestPass
+  class TestPassState < ProgrammingState
     def establish(target)
       target.ask("Does the test pass?")
     end
     def yes(target)
-      target.state = NeedToRefactor.new
+      target.state = NeedToRefactorState.instance
     end
     def no(target)
-      target.state = WriteCode.new
+      target.state = WriteCodeState.instance
     end
   end
 
-  class WriteCode
+  class WriteCodeState < ProgrammingState
     def establish(target)
       target.doit("Write just enough code", "for the test to pass.")
     end
     def yes(target)
-      target.state = TestPass.new
+      target.state = TestPassState.instance
     end
     def no(target)
     end
   end
 
-  class NeedToRefactor
+  class NeedToRefactorState < ProgrammingState
     def establish(target)
       target.ask("Do you need to refactor?")
     end
     def yes(target)
-      target.state = Refactor.new
+      target.state = RefactorState.instance
     end
     def no(target)
-      target.state = SelectFeature.new
+      target.state = SelectFeatureState.instance
     end
   end
 
-  class SelectFeature
+  class SelectFeatureState < ProgrammingState
     def establish(target)
       target.doit("Select a feature", "to implement.")
     end
     def yes(target)
-      target.state = HaveTest.new
+      target.state = HaveTestState.instance
     end
     def no(target)
     end
   end
 
-  class Refactor
+  class RefactorState < ProgrammingState
     def establish(target)
       target.doit("Refactor the code.")
     end
     def yes(target)
-      target.state = TestPass.new
+      target.state = TestPassState.instance
     end
     def no(target)
     end
