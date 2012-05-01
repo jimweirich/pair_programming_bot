@@ -202,5 +202,6 @@ class PPBotViewController < UIViewController
     label.frame = [[margin, @title_y], [view.frame.size.width - margin * 2, 40]]
     view.addSubview(label)
     @title_y += 40
+    label
   end
 end
