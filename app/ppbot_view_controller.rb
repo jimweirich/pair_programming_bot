@@ -1,5 +1,5 @@
 class PPBotViewController < UIViewController
-  attr_accessor :state
+  attr_accessor :state, :restart_button
 
   def viewDidLoad
     create_title
@@ -38,8 +38,15 @@ class PPBotViewController < UIViewController
     @no_button.frame = [[margin, top+3*60], [view.frame.size.width - margin * 2, 40]]
     view.addSubview(@no_button)
 
-    @state = HaveTestState.instance
-    @state.establish(self)
+    @restart_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    @restart_button.setTitle('Restart', forState:UIControlStateNormal)
+    @restart_button.setTitle('Restart', forState:UIControlStateSelected)
+    @restart_button.addTarget(self, action:'restartTapped', forControlEvents:UIControlEventTouchUpInside)
+    midway = view.frame.size.width / 2
+    @restart_button.frame = [[margin + midway, top+4*60], [(view.frame.size.width - margin)/2 - margin - 15, 40]]
+    view.addSubview(@restart_button)
+
+    restartTapped
   end
 
   def yesTapped
@@ -52,6 +59,11 @@ class PPBotViewController < UIViewController
     @state.establish(self)
   end
 
+  def restartTapped
+    @state = HaveTestState.instance
+    @state.establish(self)
+  end
+
   def ask(question)
     set_text(question)
     @yes_button.setTitle("Yes", forState:UIControlStateNormal)
@@ -59,6 +71,7 @@ class PPBotViewController < UIViewController
     @no_button.setTitle("No", forState:UIControlStateNormal)
     @no_button.setTitleColor(red, forState: UIControlStateNormal)
     @no_button.hidden = false
+    @restart_button.hidden = false
   end
 
   def doit(action, more_action=nil)
@@ -67,6 +80,7 @@ class PPBotViewController < UIViewController
     @yes_button.setTitleColor(blue, forState: UIControlStateNormal)
     @no_button.setTitle("", forState:UIControlStateNormal)
     @no_button.hidden = true
+    @restart_button.hidden = false
   end
 
   def set_text(text1, text2=nil)
@@ -85,7 +99,7 @@ class PPBotViewController < UIViewController
     @margin ||= 30
   end
 
-  def blue
+    def blue
     @blue ||= UIColor.colorWithRed(0.10, green: 0.10, blue: 0.70, alpha: 1.0)
   end
 
@@ -106,6 +120,7 @@ class PPBotViewController < UIViewController
   class HaveTestState < ProgrammingState
     def establish(target)
       target.ask("Do you have a test for that?")
+      target.restart_button.hidden = true
     end
     def yes(target)
       target.state = TestPassState.instance
