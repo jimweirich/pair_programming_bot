@@ -43,7 +43,7 @@ class PPBotViewController < UIViewController
     @restart_button.setTitle('Restart', forState:UIControlStateSelected)
     @restart_button.addTarget(self, action:'restartTapped', forControlEvents:UIControlEventTouchUpInside)
     midway = view.frame.size.width / 2
-    @restart_button.frame = [[margin + midway, top+4*60], [(view.frame.size.width - margin)/2 - margin - 15, 40]]
+    @restart_button.frame = [[midway, top+4*60], [(view.frame.size.width - margin*2)/2, 40]]
     view.addSubview(@restart_button)
 
     restartTapped
