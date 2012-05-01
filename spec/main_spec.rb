@@ -7,3 +7,13 @@ describe "Application 'pairprogrammingbot'" do
     @app.windows.size.should == 1
   end
 end
+
+describe PPBotViewController do
+  before do
+    @controller = PPBotViewController.alloc.init
+  end
+
+  it "has a controller" do
+    @controller.should != nil
+  end
+end
