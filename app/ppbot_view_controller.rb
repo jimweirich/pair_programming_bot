@@ -77,7 +77,7 @@ class PPBotViewController < UIViewController
   def transition
     delay = 0.25
     UIView.animateWithDuration(delay,
-      animations: lambda { @q1.alpha = 0; @q2.alpha = 0; hide_buttons },
+      animations: lambda { @q1.alpha = 0; @q2.alpha = 0 },
       completion: lambda { |finished|
         @state.establish(self)
         UIView.animateWithDuration(delay,
@@ -90,6 +90,7 @@ class PPBotViewController < UIViewController
   def restart
     @state = States::HaveTestState.instance
     @state.establish(self)
+    delayed_show_buttons
   end
 
   def swipeGesture(gesture)
@@ -107,25 +108,10 @@ class PPBotViewController < UIViewController
     @asking = false
   end
 
-  def hide_buttons
-    # @yes_button.hidden = true
-    # @no_button.hidden = true
-    # @done_button.hidden = true
-    @yes_button.alpha = 0.0
-    @no_button.alpha = 0.0
-    @done_button.alpha = 0.0
-  end
-
   def delayed_show_buttons
-    # @yes_button.hidden = ! @asking
-    # @no_button.hidden = ! @asking
-    # @done_button.hidden = @asking
-    if @asking
-      @yes_button.alpha = 1.0
-      @no_button.alpha = 1.0
-    else
-      @done_button.alpha = 1.0
-    end
+    @yes_button.hidden  = ! @asking
+    @no_button.hidden   = ! @asking
+    @done_button.hidden = @asking
   end
 
   def set_text(text1, text2=nil)
