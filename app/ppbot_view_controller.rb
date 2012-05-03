@@ -60,17 +60,29 @@ class PPBotViewController < UIViewController
 
   def yesTapped
     @state.yes(self)
-    @state.establish(self)
+    transition
   end
 
   def noTapped
     @state.no(self)
-    @state.establish(self)
+    transition
   end
 
   def doneTapped
     @state.yes(self)
-    @state.establish(self)
+    transition
+  end
+
+  def transition
+    delay = 0.5
+    UIView.animateWithDuration(delay,
+      animations: lambda { @q1.alpha = 0; @q2.alpha = 0 },
+      completion: lambda { |finished|
+        @state.establish(self)
+        UIView.animateWithDuration(delay,
+          animations: lambda { @q1.alpha = 1; @q2.alpha = 1 })
+      })
+
   end
 
   def restart
@@ -79,7 +91,8 @@ class PPBotViewController < UIViewController
   end
 
   def swipeGesture(gesture)
-    restart
+    @state = HaveTestState.instance
+    transition
   end
 
   def ask(question)
