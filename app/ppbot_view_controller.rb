@@ -74,7 +74,7 @@ class PPBotViewController < UIViewController
   end
 
   def transition
-    delay = 0.5
+    delay = 0.25
     UIView.animateWithDuration(delay,
       animations: lambda { @q1.alpha = 0; @q2.alpha = 0 },
       completion: lambda { |finished|
