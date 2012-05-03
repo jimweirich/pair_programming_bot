@@ -1,52 +1,61 @@
 class PPBotViewController < UIViewController
-  attr_accessor :state, :restart_button
+  attr_accessor :state
+
+  def loadView
+    self.view = UIImageView.alloc.init
+  end
 
   def viewDidLoad
+    view.image = UIImage.imageNamed("background.png")
+
     create_title
 
-    top = 200
+    top = 310
 
     @q1 = UILabel.new
     @q1.font = UIFont.systemFontOfSize(20)
     @q1.text = '(initial)'
     @q1.textAlignment = UITextAlignmentCenter
-    @q1.textColor = UIColor.whiteColor
+    @q1.textColor = UIColor.darkGrayColor
     @q1.backgroundColor = UIColor.clearColor
-    @q1.frame = [[margin, top+30], [view.frame.size.width - margin * 2, 40]]
+    @q1.frame = [[margin, top+48], [view.frame.size.width - margin * 2, 30]]
     view.addSubview(@q1)
 
     @q2 = UILabel.new
     @q2.font = UIFont.systemFontOfSize(20)
     @q2.text = '(initial)'
     @q2.textAlignment = UITextAlignmentCenter
-    @q2.textColor = UIColor.whiteColor
+    @q2.textColor = UIColor.darkGrayColor
     @q2.backgroundColor = UIColor.clearColor
-    @q2.frame = [[margin, top+60], [view.frame.size.width - margin * 2, 40]]
+    @q2.frame = [[margin, top+78], [view.frame.size.width - margin * 2, 30]]
     view.addSubview(@q2)
 
-    @yes_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-    @yes_button.setTitle('(A)', forState:UIControlStateNormal)
-    @yes_button.setTitle('(A)', forState:UIControlStateSelected)
-    @yes_button.addTarget(self, action:'yesTapped', forControlEvents:UIControlEventTouchUpInside)
-    @yes_button.frame = [[margin, top+2*60], [view.frame.size.width - margin * 2, 40]]
+    midway = view.frame.size.width / 2
+    width_less_margins = view.frame.size.width - 2*margin
+    full_button_size = [width_less_margins, 40]
+    half_button_size = [width_less_margins/2 - margin/2, 40]
+
+    @yes_button = make_button("Yes", "yesTapped", green)
+    @yes_button.frame = [[margin, top+2*60], half_button_size]
     view.addSubview(@yes_button)
 
-    @no_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-    @no_button.setTitle('(B)', forState:UIControlStateNormal)
-    @no_button.setTitle('(B)', forState:UIControlStateSelected)
-    @no_button.addTarget(self, action:'noTapped', forControlEvents:UIControlEventTouchUpInside)
-    @no_button.frame = [[margin, top+3*60], [view.frame.size.width - margin * 2, 40]]
+    @no_button = make_button("No", "noTapped", red)
+    @no_button.frame = [[midway+margin/2, top+2*60], half_button_size]
     view.addSubview(@no_button)
 
-    @restart_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-    @restart_button.setTitle('Restart', forState:UIControlStateNormal)
-    @restart_button.setTitle('Restart', forState:UIControlStateSelected)
-    @restart_button.addTarget(self, action:'restartTapped', forControlEvents:UIControlEventTouchUpInside)
-    midway = view.frame.size.width / 2
-    @restart_button.frame = [[midway, top+4*60], [(view.frame.size.width - margin*2)/2, 40]]
-    view.addSubview(@restart_button)
+    @done_button = make_button("Done", "doneTapped", blue)
+    @done_button.frame = [[margin, top+2*60], full_button_size]
+    view.addSubview(@done_button)
 
-    restartTapped
+    previousGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
+    previousGesture.direction = UISwipeGestureRecognizerDirectionLeft
+    view.addGestureRecognizer(previousGesture)
+    nextGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
+    nextGesture.direction = UISwipeGestureRecognizerDirectionRight
+    view.addGestureRecognizer(nextGesture)
+
+    view.userInteractionEnabled = true
+    restart
   end
 
   def yesTapped
@@ -59,28 +68,32 @@ class PPBotViewController < UIViewController
     @state.establish(self)
   end
 
-  def restartTapped
+  def doneTapped
+    @state.yes(self)
+    @state.establish(self)
+  end
+
+  def restart
     @state = HaveTestState.instance
     @state.establish(self)
   end
 
+  def swipeGesture(gesture)
+    restart
+  end
+
   def ask(question)
     set_text(question)
-    @yes_button.setTitle("Yes", forState:UIControlStateNormal)
-    @yes_button.setTitleColor(green, forState: UIControlStateNormal)
-    @no_button.setTitle("No", forState:UIControlStateNormal)
-    @no_button.setTitleColor(red, forState: UIControlStateNormal)
+    @yes_button.hidden = false
     @no_button.hidden = false
-    @restart_button.hidden = false
+    @done_button.hidden = true
   end
 
   def doit(action, more_action=nil)
     set_text(action, more_action)
-    @yes_button.setTitle("Done", forState:UIControlStateNormal)
-    @yes_button.setTitleColor(blue, forState: UIControlStateNormal)
-    @no_button.setTitle("", forState:UIControlStateNormal)
+    @yes_button.hidden = true
     @no_button.hidden = true
-    @restart_button.hidden = false
+    @done_button.hidden = false
   end
 
   def set_text(text1, text2=nil)
@@ -99,7 +112,7 @@ class PPBotViewController < UIViewController
     @margin ||= 30
   end
 
-    def blue
+  def blue
     @blue ||= UIColor.colorWithRed(0.10, green: 0.10, blue: 0.70, alpha: 1.0)
   end
 
@@ -120,7 +133,6 @@ class PPBotViewController < UIViewController
   class HaveTestState < ProgrammingState
     def establish(target)
       target.ask("Do you have a test for that?")
-      target.restart_button.hidden = true
     end
     def yes(target)
       target.state = TestPassState.instance
@@ -200,19 +212,27 @@ class PPBotViewController < UIViewController
 
   private
 
+  def make_button(title, action, color)
+    button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    button.setTitle(title, forState:UIControlStateNormal)
+    button.setTitleColor(color, forState:UIControlStateNormal)
+    button.setTitle(title, forState:UIControlStateSelected)
+    button.addTarget(self, action:action, forControlEvents:UIControlEventTouchUpInside)
+    button
+  end
+
+
   def create_title
     @title_y = 30
-    @title1 = create_title_label("Pair")
-    @title2 = create_title_label("Programming")
-    @title3 = create_title_label("Bot")
+    @title1 = create_title_label("Pair Programming Bot")
   end
 
   def create_title_label(text)
     label = UILabel.new
-    label.font = UIFont.systemFontOfSize(40)
+    label.font = UIFont.systemFontOfSize(26)
     label.text = text
     label.textAlignment = UITextAlignmentCenter
-    label.textColor = UIColor.whiteColor
+    label.textColor = UIColor.blackColor
     label.backgroundColor = UIColor.clearColor
     label.frame = [[margin, @title_y], [view.frame.size.width - margin * 2, 45]]
     view.addSubview(label)
