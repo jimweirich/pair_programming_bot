@@ -47,12 +47,13 @@ class PPBotViewController < UIViewController
     @done_button.frame = [[margin, top+2*60], full_button_size]
     view.addSubview(@done_button)
 
-    previousGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
-    previousGesture.direction = UISwipeGestureRecognizerDirectionLeft
-    view.addGestureRecognizer(previousGesture)
-    nextGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
-    nextGesture.direction = UISwipeGestureRecognizerDirectionRight
-    view.addGestureRecognizer(nextGesture)
+    @previousGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
+    @previousGesture.direction = UISwipeGestureRecognizerDirectionLeft
+    view.addGestureRecognizer(@previousGesture)
+
+    @nextGesture = UISwipeGestureRecognizer.alloc.initWithTarget(self, action:'swipeGesture:')
+    @nextGesture.direction = UISwipeGestureRecognizerDirectionRight
+    view.addGestureRecognizer(@nextGesture)
 
     view.userInteractionEnabled = true
     restart
@@ -76,11 +77,12 @@ class PPBotViewController < UIViewController
   def transition
     delay = 0.25
     UIView.animateWithDuration(delay,
-      animations: lambda { @q1.alpha = 0; @q2.alpha = 0 },
+      animations: lambda { @q1.alpha = 0; @q2.alpha = 0; hide_buttons },
       completion: lambda { |finished|
         @state.establish(self)
         UIView.animateWithDuration(delay,
-          animations: lambda { @q1.alpha = 1; @q2.alpha = 1 })
+          animations: lambda { @q1.alpha = 1; @q2.alpha = 1 },
+          completion: lambda { |finished| delayed_show_buttons })
       })
 
   end
@@ -97,16 +99,33 @@ class PPBotViewController < UIViewController
 
   def ask(question)
     set_text(question)
-    @yes_button.hidden = false
-    @no_button.hidden = false
-    @done_button.hidden = true
+    @asking = true
   end
 
   def doit(action, more_action=nil)
     set_text(action, more_action)
-    @yes_button.hidden = true
-    @no_button.hidden = true
-    @done_button.hidden = false
+    @asking = false
+  end
+
+  def hide_buttons
+    # @yes_button.hidden = true
+    # @no_button.hidden = true
+    # @done_button.hidden = true
+    @yes_button.alpha = 0.0
+    @no_button.alpha = 0.0
+    @done_button.alpha = 0.0
+  end
+
+  def delayed_show_buttons
+    # @yes_button.hidden = ! @asking
+    # @no_button.hidden = ! @asking
+    # @done_button.hidden = @asking
+    if @asking
+      @yes_button.alpha = 1.0
+      @no_button.alpha = 1.0
+    else
+      @done_button.alpha = 1.0
+    end
   end
 
   def set_text(text1, text2=nil)
