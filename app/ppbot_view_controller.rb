@@ -76,21 +76,14 @@ class PPBotViewController < UIViewController
 
   def transition
     delay = 0.25
-    UIView.animateWithDuration(delay,
-      animations: lambda { @q1.alpha = 0; @q2.alpha = 0 },
-      completion: lambda { |finished|
-        @state.establish(self)
-        UIView.animateWithDuration(delay,
-          animations: lambda { @q1.alpha = 1; @q2.alpha = 1 },
-          completion: lambda { |finished| delayed_show_buttons })
-      })
-
+    @state.establish(self)
+    show_buttons
   end
 
   def restart
     @state = States::HaveTestState.instance
     @state.establish(self)
-    delayed_show_buttons
+    show_buttons
   end
 
   def swipeGesture(gesture)
@@ -108,7 +101,7 @@ class PPBotViewController < UIViewController
     @asking = false
   end
 
-  def delayed_show_buttons
+  def show_buttons
     @yes_button.hidden  = ! @asking
     @no_button.hidden   = ! @asking
     @done_button.hidden = @asking
