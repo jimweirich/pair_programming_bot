@@ -9,4 +9,5 @@ Motion::Project::App.setup do |app|
   app.provisioning_profile = PROVISIONING_FILE
   app.icons << "Icon.png" << "Icon@2x.png"
   app.prerendered_icon = true
+  app.frameworks += ['CoreData', 'CoreLocation', 'QuartzCore']
 end
